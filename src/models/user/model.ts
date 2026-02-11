@@ -40,4 +40,9 @@ userSchema.pre("save", async function (next) {
   user.password = encrypt(user.password);
 });
 
+userSchema.methods.verifyPassword = function (password: string) {
+  const user = this as mongoose.Document & { password: string };
+  return encrypt(password) === user.password;
+}
+
 export default UserModal;
