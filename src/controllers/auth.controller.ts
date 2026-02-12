@@ -2,9 +2,16 @@ import type { Request, Response } from "express";
 import UserModal from "../models/user/model.js";
 import type { UserDocument } from "../types/index.js";
 import { GenerateToken } from "../utils/jwt.js";
+import { sendRegistrationEmail } from "../services/gmail.service.js";
 
-export const LoginUserController = async (req: Request, res: Response) => {
-  const { name, email, password } = req.body;
+export const RegisterUserController = async (req: Request, res: Response) => {
+
+  console.log(req.body)
+  // const { name, email, password } = req.body;
+
+  const name = req.body.name;
+  const email = req.body.email;
+  const password = req.body.password;
 
   const existingUser = await UserModal.findOne({ email });
 
@@ -17,12 +24,13 @@ export const LoginUserController = async (req: Request, res: Response) => {
   const newUser = new UserModal({ name, email, password });
   await newUser.save();
 
+  await sendRegistrationEmail(email);
+
   const AuthToken = GenerateToken(
     {
       id: newUser._id,
       email: newUser.email,
     },
-    process.env.JWT_SECRET as string,
     60 * 60 * 24,
   );
 
@@ -32,7 +40,7 @@ export const LoginUserController = async (req: Request, res: Response) => {
     .json({ message: "User created successfully", success: true });
 };
 
-export const RegisterUserController = async (req: Request, res: Response) => {
+export const LoginUserController = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   const existingUser = (await UserModal.findOne({ email }).select(
@@ -56,7 +64,6 @@ export const RegisterUserController = async (req: Request, res: Response) => {
       id: existingUser._id,
       email: existingUser.email,
     },
-    process.env.JWT_SECRET as string,
     60 * 60 * 24,
   );
 

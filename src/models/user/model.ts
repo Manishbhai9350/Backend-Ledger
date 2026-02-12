@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { encrypt } from "../../utils/encryption.js";
+import { decrypt, encrypt } from "../../utils/encryption.js";
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -23,7 +23,10 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-const UserModal = mongoose.model("User", userSchema);
+userSchema.methods.verifyPassword = function (password: string) {
+  const user = this as mongoose.Document & { password: string };
+  return (password) === decrypt(user.password);
+};
 
 userSchema.pre("save", async function (next) {
   const user = this as mongoose.Document & {
@@ -40,9 +43,6 @@ userSchema.pre("save", async function (next) {
   user.password = encrypt(user.password);
 });
 
-userSchema.methods.verifyPassword = function (password: string) {
-  const user = this as mongoose.Document & { password: string };
-  return encrypt(password) === user.password;
-}
+const UserModal = mongoose.model("User", userSchema);
 
 export default UserModal;

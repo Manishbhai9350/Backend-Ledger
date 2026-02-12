@@ -1,8 +1,12 @@
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const secret = process.env.JWT_SECRET as string;
 
 export const GenerateToken = (
   payload: string | object | Buffer<ArrayBufferLike>,
-  secret: jwt.Secret | jwt.PrivateKey,
   expiresIn?: number,
 ) => {
   if (expiresIn) {
