@@ -14,3 +14,8 @@ export const GenerateToken = (
   }
   return jwt.sign(payload, secret);
 };
+
+
+export const DecodeToken = (token: string):any => {
+  return jwt.verify(token,secret)
+}
