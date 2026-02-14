@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
+import type { ITransaction } from "../../types/index.js";
 
-const TransactionSchema = new mongoose.Schema({
+const TransactionSchema = new mongoose.Schema<ITransaction>({
   fromAccount: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Account",
@@ -14,7 +15,7 @@ const TransactionSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: {
-      values: ["PENDING", "COMPLETED", "FAILED"],
+      values: ["PENDING", "COMPLETED", "FAILED", "REVERSED"],
     },
     default: "PENDING",
   },
@@ -22,7 +23,7 @@ const TransactionSchema = new mongoose.Schema({
     type: Number,
     required: [true,'Amount is required']
   },
-  idempotencykey: {
+  idempotencyKey: {
     type: String,
     required: [true, "Idempotency Key is required"],
     unique: true,

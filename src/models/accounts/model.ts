@@ -1,18 +1,28 @@
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
+import { LedgerModel } from "../ledger/model.js";
+import type {
+  AccountDocument,
+  IAccount,
+  IAccountMethods,
+} from "../../types/index.js";
 
-const AccountSchema = new mongoose.Schema(
+const AccountSchema = new mongoose.Schema<
+  IAccount,
+  Model<IAccount, {}, IAccountMethods>,
+  IAccountMethods
+>(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      index: true
+      index: true,
     },
     status: {
       type: String,
       enum: {
         values: ["ACTIVE", "FROZEN", "CLOSED"],
-        message: 'Statis can only be ACTIVE, FROZEN or CLOSED'
+        message: "Statis can only be ACTIVE, FROZEN or CLOSED",
       },
       default: "ACTIVE",
     },
@@ -26,6 +36,43 @@ const AccountSchema = new mongoose.Schema(
   },
 );
 
-AccountSchema.index({ user:1,status:1 })
+AccountSchema.index({ user: 1, status: 1 });
 
-export const AccountModel = mongoose.model('Account',AccountSchema)
+AccountSchema.methods.getBalance = async function (
+  this: AccountDocument,
+): Promise<number> {
+  const balance = await LedgerModel.aggregate([
+    {
+      $match: { account: this._id },
+    },
+    {
+      $group: {
+        _id: null,
+        totalDebit: {
+          $sum: {
+            $cond: [{ $eq: ["type", "DEBIT"] }, "$amount", 0],
+          },
+        },
+        totalCredit: {
+          $sum: {
+            $cond: [{ $eq: ["type", "CREDIT"] }, "$amount", 0],
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        balance: { $subtract: ["$totalCredit", "$totalDebit"] },
+      },
+    },
+  ]);
+
+  if (balance.length == 0) {
+    return 0;
+  }
+
+  return balance[0].balance;
+};
+
+export const AccountModel = mongoose.model("Account", AccountSchema);
