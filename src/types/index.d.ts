@@ -1,5 +1,4 @@
-import type { Document, Model} from "mongoose";
-
+import type { Document, Model } from "mongoose";
 
 export type UserDocument = Document & {
   email: string;
@@ -8,10 +7,10 @@ export type UserDocument = Document & {
   verifyPassword: (val: string) => boolean;
 };
 
-
 // Account Types
 export interface IAccount {
   user: ObjectId;
+  name: string;
   status: "ACTIVE" | "FROZEN" | "CLOSED";
   currency: string;
 }
@@ -21,7 +20,6 @@ export interface IAccountMethods {
 }
 
 export type AccountDocument = Document & IAccount & IAccountMethods;
-
 
 // Transaction Types
 

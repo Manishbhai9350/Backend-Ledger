@@ -4,6 +4,7 @@ import { TransactionModel } from "../models/transaction/model.js";
 import mongoose, { type Document, type ObjectId } from "mongoose";
 import { LedgerModel } from "../models/ledger/model.js";
 import { sendTransactionEmail } from "../services/gmail.service.js";
+import { AppError } from "../middlewares/error.middleware.js";
 
 interface BodyProps {
   fromAccount: string;
@@ -13,8 +14,9 @@ interface BodyProps {
 }
 
 export const CreateTransactionController = async (
-  req: Request & { user: Document },
+  req: Request & { user?: Document },
   res: Response,
+  next: Function,
 ) => {
   try {
     const {
@@ -28,6 +30,9 @@ export const CreateTransactionController = async (
       throw new Error("Provided full data");
     }
 
+    if (!req?.user) {
+      throw new Error("Please Login First!");
+    }
     const account = await AccountModel.findOne({
       user: req.user._id,
     });
@@ -150,10 +155,13 @@ export const CreateTransactionController = async (
       transaction: createdTransaction,
       success: true,
     });
-  } catch (error) {
-    return res.status(401).json({
-      message: "Something Went Wrong",
-      success: false,
-    });
+  } catch (error: any) {
+    // Forward to centralized error handler
+    next(
+      error instanceof AppError
+        ? error
+        : new AppError(error.message || "Server Error", 500),
+    );
   }
 };
+

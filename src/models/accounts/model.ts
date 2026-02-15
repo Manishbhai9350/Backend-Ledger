@@ -12,6 +12,10 @@ const AccountSchema = new mongoose.Schema<
   IAccountMethods
 >(
   {
+    name: {
+      type: String,
+      required: [true,'Account Name Is Required']
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
