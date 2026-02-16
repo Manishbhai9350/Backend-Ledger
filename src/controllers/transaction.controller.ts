@@ -120,7 +120,7 @@ export const CreateTransactionController = async (
           {
             type: "DEBIT",
             transaction: transaction._id,
-            account: account._id,
+            account: fromAccount._id,
             amount,
           },
         ],
@@ -132,7 +132,7 @@ export const CreateTransactionController = async (
           {
             type: "CREDIT",
             transaction: transaction._id,
-            account: account._id,
+            account: toAccount._id,
             amount,
           },
         ],
