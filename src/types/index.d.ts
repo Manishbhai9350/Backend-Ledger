@@ -9,10 +9,11 @@ export type UserDocument = Document & {
 
 // Account Types
 export interface IAccount {
-  user: ObjectId;
+  user: ObjectId | Document;
   name: string;
   status: "ACTIVE" | "FROZEN" | "CLOSED";
   currency: string;
+  systemUser?: boolean;
 }
 
 export interface IAccountMethods {

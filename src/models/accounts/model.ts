@@ -14,7 +14,7 @@ const AccountSchema = new mongoose.Schema<
   {
     name: {
       type: String,
-      required: [true,'Account Name Is Required']
+      required: [true, "Account Name Is Required"],
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -34,6 +34,12 @@ const AccountSchema = new mongoose.Schema<
       type: String,
       default: "INR",
     },
+    systemUser: {
+      type: Boolean,
+      default: false,
+      immutable: true,
+      select: false,
+    }
   },
   {
     timestamps: true,
@@ -54,12 +60,12 @@ AccountSchema.methods.getBalance = async function (
         _id: null,
         totalDebit: {
           $sum: {
-            $cond: [{ $eq: ["type", "DEBIT"] }, "$amount", 0],
+            $cond: [{ $eq: ["$type", "DEBIT"] }, "$amount", 0],
           },
         },
         totalCredit: {
           $sum: {
-            $cond: [{ $eq: ["type", "CREDIT"] }, "$amount", 0],
+            $cond: [{ $eq: ["$type", "CREDIT"] }, "$amount", 0],
           },
         },
       },

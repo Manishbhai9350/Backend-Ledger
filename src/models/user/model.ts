@@ -21,11 +21,17 @@ const userSchema = new mongoose.Schema({
     minlength: [6, "Password must be at least 6 characters long"],
     select: false,
   },
+  systemUser: {
+    type: Boolean,
+    default: false,
+    immutable: true,
+    select: false,
+  },
 });
 
 userSchema.methods.verifyPassword = function (password: string) {
   const user = this as mongoose.Document & { password: string };
-  return (password) === decrypt(user.password);
+  return password === decrypt(user.password);
 };
 
 userSchema.pre("save", async function (next) {
