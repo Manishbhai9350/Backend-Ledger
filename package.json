@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "npx nodemon ./dist/app.js",
-    "build": "npm install & npx tsc"
+    "build": "npm install & npm install typescript & npx tsc"
   },
   "keywords": [],
   "author": "",
