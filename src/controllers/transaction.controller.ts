@@ -192,10 +192,7 @@ export const CreateInitialFundTransactionController = async (
     const toAccount = (await AccountModel.findOne({
       _id: toAccountId,
     })) as AccountDocument;
-
-    console.log(SystemAccount)
-    console.log(toAccount)
-
+    
     if (!SystemAccount || !toAccount) {
       throw new Error("Invalid Data");
     }

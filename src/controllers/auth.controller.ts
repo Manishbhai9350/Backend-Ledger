@@ -3,11 +3,10 @@ import UserModal from "../models/user/model.js";
 import type { UserDocument } from "../types/index.js";
 import { GenerateToken } from "../utils/jwt.js";
 import { sendRegistrationEmail } from "../services/gmail.service.js";
+import BlackListModel from "../models/blacklist/model.js";
+import { AppError } from "../middlewares/error.middleware.js";
 
 export const RegisterUserController = async (req: Request, res: Response) => {
-
-  console.log(req.body)
-  // const { name, email, password } = req.body;
 
   const name = req.body.name;
   const email = req.body.email;
@@ -70,4 +69,33 @@ export const LoginUserController = async (req: Request, res: Response) => {
   res
     .cookie("auth_token", AuthToken, { httpOnly: true, secure: false })
     .json({ message: "Login successful", success: true });
+};
+
+export const LogoutUserController = async (req: Request, res: Response,next: Function) => {
+  try {
+    const token = req.cookies["auth_token"] || req.headers?.authorization;
+
+    if (!token) {
+      return res.status(200).json({
+        message: "Already Logged Out",
+        success: true,
+      });
+    }
+
+    const blackListedToken = await BlackListModel.create({
+      token,
+    });
+
+    return res.status(200).cookie("auth_token", "").json({
+      message: "Logged Out Successfully",
+      success: true,
+    });
+  } catch (error: any) {
+    // Forward to centralized error handler
+    next(
+      error instanceof AppError
+        ? error
+        : new AppError(error.message || "Server Error", 500),
+    );
+  }
 };

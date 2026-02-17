@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { AuthMiddleware } from "../../middlewares/auth.middleware.js";
+import { AuthMiddleware, BlackListMiddleware } from "../../middlewares/auth.middleware.js";
 import { CreateInitialFundTransactionController, CreateTransactionController } from "../../controllers/transaction.controller.js";
 import { SystemAuthMiddleware } from "../../middlewares/auth.system.middleware.js";
 
@@ -7,8 +7,8 @@ import { SystemAuthMiddleware } from "../../middlewares/auth.system.middleware.j
 const router = Router();
 
 
-router.post('/create',AuthMiddleware,CreateTransactionController)
-router.post('/system/initial-funds',SystemAuthMiddleware,CreateInitialFundTransactionController)
+router.post('/create',AuthMiddleware,BlackListMiddleware,CreateTransactionController)
+router.post('/system/initial-funds',SystemAuthMiddleware,BlackListMiddleware,CreateInitialFundTransactionController)
 
 
 

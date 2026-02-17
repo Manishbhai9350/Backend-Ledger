@@ -1,14 +1,14 @@
 import { Router } from "express";
-import { AuthMiddleware } from "../../middlewares/auth.middleware.js";
+import { AuthMiddleware, BlackListMiddleware } from "../../middlewares/auth.middleware.js";
 import { CreateAccountController, GetAccountBalance, GetUserAccountController, GetUserAccountsController } from "../../controllers/account.controller.js";
 
 
 const router = Router()
 
-router.get('/',AuthMiddleware,GetUserAccountsController)
-router.get('/:account',AuthMiddleware,GetUserAccountController)
-router.get('/balance/:account',AuthMiddleware,GetAccountBalance)
-router.post('/create',AuthMiddleware,CreateAccountController)
+router.get('/',AuthMiddleware,BlackListMiddleware,GetUserAccountsController)
+router.get('/:account',AuthMiddleware,BlackListMiddleware,GetUserAccountController)
+router.get('/balance/:account',AuthMiddleware,BlackListMiddleware,GetAccountBalance)
+router.post('/create',AuthMiddleware,BlackListMiddleware,CreateAccountController)
 
 
 export { router as AccountRouter }
